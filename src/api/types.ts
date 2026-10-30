@@ -1,4 +1,4 @@
-// Shapes of the API described in specs/001-onboarding-sesion/contracts/api.md.
+// Shapes of the API described in specs/008-autenticacion-firebase/contracts/api.md.
 
 export interface Guest {
   id: string
@@ -13,27 +13,22 @@ export interface EventSummary {
   departurePlaces: string[]
 }
 
+// Me is the state of the signed-in account (GET /api/me and POST /api/onboarding/link).
+export type Me =
+  | { status: 'unlinked' }
+  | { status: 'pending' | 'declined'; guest: Guest; event: EventSummary }
+  | { status: 'confirmed'; guest: Guest }
+
 export interface GuestsResponse {
   guests: Guest[]
 }
 
-export interface VerifyResponse {
-  event: EventSummary
-}
-
-export type RespondResponse =
-  | { status: 'confirmed'; guest: Guest }
-  | { status: 'declined' }
-
-export type ReentryResponse =
-  | { status: 'confirmed'; guest: Guest }
-  | { status: 'declined'; guest: Guest; event: EventSummary }
-
-export interface ConfirmOtherResponse {
-  status: 'confirmed'
+export interface RespondResponse {
+  status: 'confirmed' | 'declined'
   guest: Guest
 }
 
-export interface SessionResponse {
+export interface ConfirmOtherResponse {
+  status: 'confirmed'
   guest: Guest
 }

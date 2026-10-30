@@ -12,6 +12,9 @@ export const textLink =
 export const textInput =
   'min-h-12 w-full rounded-2xl border-2 border-orange-200 bg-white px-4 py-3 text-center text-xl tracking-widest outline-none focus:border-orange-500'
 
+export const fieldInput =
+  'min-h-12 w-full rounded-2xl border-2 border-orange-200 bg-white px-4 py-3 text-lg outline-none focus:border-orange-500'
+
 export function Alert({ children }: { children: ReactNode }) {
   return (
     <p role="alert" className="rounded-2xl bg-rose-100 px-4 py-3 text-center text-rose-800">

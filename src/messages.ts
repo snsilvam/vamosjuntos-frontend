@@ -1,12 +1,12 @@
 import { ApiError } from './api/client'
 
 // Where the error happened; the same code reads differently in each flow.
-export type MessageContext = 'list' | 'reentry' | 'other'
+export type MessageContext = 'list' | 'byCode' | 'other'
 
 const genericMessage = 'Algo salió mal. Intenta de nuevo en un momento.'
 
-// friendlyMessage turns any error into the Spanish text of contracts/api.md. Technical details
-// never reach the user (Principle V).
+// friendlyMessage turns an API error into the Spanish text of contracts/api.md. Technical
+// details never reach the user (Principle V).
 export function friendlyMessage(
   error: unknown,
   context: MessageContext,
@@ -16,13 +16,17 @@ export function friendlyMessage(
 
   switch (error.code) {
     case 'invalid_code':
-      if (context === 'reentry') return 'No encontramos ese código. Revísalo e intenta de nuevo.'
+      if (context === 'byCode') return 'No encontramos ese código. Revísalo e intenta de nuevo.'
       if (context === 'other') return `Ese código no corresponde a ${vars.nombre ?? 'esa persona'}.`
       return 'Ese código no coincide con tu nombre. Revísalo e intenta de nuevo.'
     case 'too_many_attempts': {
       const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60))
       return `Demasiados intentos. Espera ${minutes} ${minutes === 1 ? 'minuto' : 'minutos'} e inténtalo otra vez.`
     }
+    case 'account_already_linked':
+      return 'Tu cuenta ya está vinculada a otro invitado.'
+    case 'guest_already_linked':
+      return 'Esta persona ya entró con otra cuenta. Si eres tú y perdiste esa cuenta, escríbele al organizador.'
     case 'event_not_found':
       return 'El paseo aún no está disponible. Intenta más tarde.'
     case 'guest_not_found':
@@ -31,8 +35,39 @@ export function friendlyMessage(
       return 'Esta persona ya respondió la invitación.'
     case 'already_confirmed':
       return 'Ya habías confirmado tu asistencia.'
-    case 'pending_use_list':
-      return 'Aún no has confirmado. Busca tu nombre en la lista.'
+    case 'not_invited':
+      return 'Ya no apareces en la lista de invitados. Escríbele al organizador.'
+    default:
+      return genericMessage
+  }
+}
+
+// friendlyAuthMessage translates the errors of the Firebase SDK (codes "auth/...") into Spanish
+// (FR-016). It returns null when there is nothing to show, such as a Google window the user
+// closed on purpose.
+export function friendlyAuthMessage(error: unknown): string | null {
+  const code = (error as { code?: unknown } | null)?.code
+  switch (code) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+    case 'auth/invalid-email':
+      return 'El correo o la contraseña no son correctos.'
+    case 'auth/email-already-in-use':
+      return 'Ya existe una cuenta con ese correo. Entra con tu contraseña.'
+    case 'auth/weak-password':
+      return 'La contraseña debe tener al menos 6 caracteres.'
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return null
+    case 'auth/popup-blocked':
+      return 'Tu navegador bloqueó la ventana de Google. Permite las ventanas emergentes e intenta otra vez.'
+    case 'auth/account-exists-with-different-credential':
+      return 'Ese correo ya entró con otro método. Usa el mismo con el que entraste antes.'
+    case 'auth/too-many-requests':
+      return 'Demasiados intentos. Espera un momento e inténtalo otra vez.'
+    case 'auth/network-request-failed':
+      return 'No hay conexión. Revisa tu internet e intenta otra vez.'
     default:
       return genericMessage
   }

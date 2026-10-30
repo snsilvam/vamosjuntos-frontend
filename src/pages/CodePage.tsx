@@ -1,37 +1,33 @@
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router'
+import { Link, Navigate, useLocation } from 'react-router'
 import { apiFetch } from '../api/client'
-import type { VerifyResponse } from '../api/types'
+import type { Guest, Me } from '../api/types'
 import Screen from '../components/Screen'
 import { Alert, primaryButton, textInput, textLink } from '../components/ui'
 import { friendlyMessage } from '../messages'
-import { useOnboarding } from '../onboarding/useOnboarding'
+import { useMe } from '../session/useMe'
 
+// CodePage links the account with the guest chosen from the list (FR-004). The code lives only
+// in this form: it is never written to storage or the URL.
 export default function CodePage() {
-  const navigate = useNavigate()
-  const { state, update } = useOnboarding()
+  const location = useLocation()
+  const { setMe } = useMe()
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (!state.guest) return <Navigate to="/" replace />
-  const guest = state.guest
+  const guest = (location.state as { guest?: Guest } | null)?.guest
+  if (!guest) return <Navigate to="/" replace />
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (!guest) return
     setSubmitting(true)
     setError(null)
     try {
-      const data = await apiFetch<VerifyResponse>('/api/onboarding/verify', {
-        method: 'POST',
-        body: { guestId: guest.id, code },
-        withDeviceId: true,
-      })
-      update({ code, event: data.event })
-      navigate('/confirmar')
+      setMe(await apiFetch<Me>('/api/onboarding/link', { method: 'POST', body: { guestId: guest.id, code } }))
     } catch (err) {
       setError(friendlyMessage(err, 'list'))
-    } finally {
       setSubmitting(false)
     }
   }

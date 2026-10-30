@@ -1,41 +1,37 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router'
 import { apiFetch } from '../api/client'
 import type { RespondResponse } from '../api/types'
+import { useAuth } from '../auth/useAuth'
 import Screen from '../components/Screen'
-import { Alert, primaryButton, secondaryButton } from '../components/ui'
+import { Alert, Loading, primaryButton, secondaryButton } from '../components/ui'
 import { formatEventDate } from '../format'
 import { friendlyMessage } from '../messages'
-import { useOnboarding } from '../onboarding/useOnboarding'
-import { useSession } from '../session/useSession'
+import { useMe } from '../session/useMe'
 
+// ConfirmPage asks the linked guest whether they attend (FR-007, FR-008). A guest who said no
+// gets here again when they sign in, so they can change their mind (US5).
 export default function ConfirmPage() {
-  const navigate = useNavigate()
-  const { state, reset } = useOnboarding()
-  const { setGuest } = useSession()
-  const [declined, setDeclined] = useState(false)
+  const { me, setMe } = useMe()
+  const { signOut } = useAuth()
+  const [farewell, setFarewell] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  if (declined) {
+  if (!me || (me.status !== 'pending' && me.status !== 'declined')) return <Loading />
+  const { guest, event } = me
+
+  if (farewell) {
     return (
-      <Screen title="¡Te vamos a extrañar!" subtitle="Si cambias de opinión, entra con tu código.">
-        <button
-          type="button"
-          className={secondaryButton}
-          onClick={() => {
-            reset()
-            navigate('/', { replace: true })
-          }}
-        >
-          Volver al inicio
+      <Screen title="¡Te vamos a extrañar!" subtitle="Si cambias de opinión, vuelve a entrar con tu cuenta.">
+        <button type="button" className={primaryButton} onClick={() => setFarewell(false)}>
+          Cambié de opinión
+        </button>
+        <button type="button" className={secondaryButton} onClick={() => void signOut()}>
+          Cerrar sesión
         </button>
       </Screen>
     )
   }
-
-  if (!state.guest || !state.event) return <Navigate to="/" replace />
-  const { guest, event, code, mode } = state
 
   async function respond(attending: boolean) {
     setSubmitting(true)
@@ -43,24 +39,25 @@ export default function ConfirmPage() {
     try {
       const data = await apiFetch<RespondResponse>('/api/onboarding/respond', {
         method: 'POST',
-        body: { guestId: guest.id, code, attending },
-        withDeviceId: true,
+        body: { attending },
       })
       if (data.status === 'confirmed') {
-        setGuest(data.guest)
-        navigate('/inicio', { replace: true })
-      } else {
-        setDeclined(true)
+        setMe({ status: 'confirmed', guest: data.guest })
+        return
       }
+      setMe({ status: 'declined', guest: data.guest, event })
+      setFarewell(true)
     } catch (err) {
-      setError(friendlyMessage(err, mode))
+      setError(friendlyMessage(err, 'list'))
     } finally {
       setSubmitting(false)
     }
   }
 
+  const title = me.status === 'declined' ? '¿Cambiaste de opinión?' : '¿Confirmas tu asistencia?'
+
   return (
-    <Screen title="¿Confirmas tu asistencia?" subtitle={`${guest.name}, este es el plan:`}>
+    <Screen title={title} subtitle={`${guest.name}, este es el plan:`}>
       <section className="rounded-3xl bg-white p-5 shadow-md ring-2 ring-orange-100">
         <h2 className="text-xl font-extrabold text-orange-700">{event.name}</h2>
         <dl className="mt-4 space-y-3">

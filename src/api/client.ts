@@ -1,4 +1,4 @@
-import { getDeviceId } from './deviceId'
+import { getIdToken } from '../auth/firebase'
 
 export class ApiError extends Error {
   readonly status: number
@@ -15,50 +15,56 @@ export class ApiError extends Error {
 }
 
 interface RequestOptions {
-  method?: 'GET' | 'POST' | 'DELETE'
+  method?: 'GET' | 'POST'
   body?: unknown
-  // Sends X-Device-Id; required by every operation that receives a code.
-  withDeviceId?: boolean
-  // A 401/403 on a protected route means the session is gone: the app returns to onboarding.
-  protectedRoute?: boolean
 }
 
 interface ErrorPayload {
   error?: { code?: string; retryAfterSeconds?: number }
 }
 
-let unauthorizedHandler: (() => void) | undefined
+// Handlers the app registers once: a 401 means the Firebase session is gone; a 403 means the
+// account is not linked, or its guest is no longer invited or confirmed.
+let unauthenticatedHandler: (() => void) | undefined
+let forbiddenHandler: ((code: string, path: string) => void) | undefined
 
-export function onUnauthorized(handler: (() => void) | undefined) {
-  unauthorizedHandler = handler
+export function onUnauthenticated(handler: (() => void) | undefined) {
+  unauthenticatedHandler = handler
 }
 
-export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export function onForbidden(handler: ((code: string, path: string) => void) | undefined) {
+  forbiddenHandler = handler
+}
+
+async function send(path: string, options: RequestOptions, forceRefresh: boolean): Promise<Response> {
   const headers: Record<string, string> = {}
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
-  if (options.withDeviceId) headers['X-Device-Id'] = getDeviceId()
-
-  let response: Response
+  const token = await getIdToken(forceRefresh)
+  if (token) headers.Authorization = `Bearer ${token}`
   try {
-    response = await fetch(path, {
+    return await fetch(path, {
       method: options.method ?? 'GET',
       headers,
-      credentials: 'same-origin',
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
     })
   } catch {
     throw new ApiError(0, 'network')
   }
+}
 
-  if (response.status === 204) return undefined as T
+// apiFetch calls the API with the Firebase ID token in Authorization. On a 401 it retries once
+// with a fresh token before giving up on the session.
+export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  let response = await send(path, options, false)
+  if (response.status === 401) response = await send(path, options, true)
 
   const data: unknown = await response.json().catch(() => undefined)
   if (!response.ok) {
     const detail = (data as ErrorPayload | undefined)?.error
-    if (options.protectedRoute && (response.status === 401 || response.status === 403)) {
-      unauthorizedHandler?.()
-    }
-    throw new ApiError(response.status, detail?.code ?? 'unknown', detail?.retryAfterSeconds)
+    const code = detail?.code ?? 'unknown'
+    if (response.status === 401) unauthenticatedHandler?.()
+    if (response.status === 403) forbiddenHandler?.(code, path)
+    throw new ApiError(response.status, code, detail?.retryAfterSeconds)
   }
   return data as T
 }

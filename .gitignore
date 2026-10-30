@@ -28,3 +28,4 @@ dist-ssr
 
 # Caché local de la CLI de Firebase
 .firebase/
+!.env.example

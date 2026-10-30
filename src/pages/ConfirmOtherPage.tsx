@@ -51,7 +51,7 @@ export default function ConfirmOtherPage() {
     try {
       const data = await apiFetch<ConfirmOtherResponse>(
         `/api/guests/${encodeURIComponent(selected.id)}/confirmation`,
-        { method: 'POST', body: { code }, withDeviceId: true, protectedRoute: true },
+        { method: 'POST', body: { code } },
       )
       // Drop the confirmed guest right away so the list never shows them as pending.
       setGuests((current) => current?.filter((g) => g.id !== data.guest.id) ?? null)

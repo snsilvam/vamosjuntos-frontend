@@ -1,17 +1,16 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link } from 'react-router'
 import { apiFetch } from '../api/client'
-import type { ReentryResponse } from '../api/types'
+import type { Me } from '../api/types'
 import Screen from '../components/Screen'
 import { Alert, primaryButton, textInput, textLink } from '../components/ui'
 import { friendlyMessage } from '../messages'
-import { useOnboarding } from '../onboarding/useOnboarding'
-import { useSession } from '../session/useSession'
+import { useMe } from '../session/useMe'
 
-export default function ReentryPage() {
-  const navigate = useNavigate()
-  const { update } = useOnboarding()
-  const { setGuest } = useSession()
+// LinkByCodePage links the account using only the code, for guests who are no longer in the
+// pending list because someone else confirmed them (US4).
+export default function LinkByCodePage() {
+  const { setMe } = useMe()
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -21,28 +20,15 @@ export default function ReentryPage() {
     setSubmitting(true)
     setError(null)
     try {
-      const data = await apiFetch<ReentryResponse>('/api/session/reentry', {
-        method: 'POST',
-        body: { code },
-        withDeviceId: true,
-      })
-      if (data.status === 'confirmed') {
-        setGuest(data.guest)
-        navigate('/inicio', { replace: true })
-        return
-      }
-      // A guest who said "No" can change their mind: ask again (FR-011).
-      update({ guest: data.guest, code, event: data.event, mode: 'reentry' })
-      navigate('/confirmar')
+      setMe(await apiFetch<Me>('/api/onboarding/link', { method: 'POST', body: { code } }))
     } catch (err) {
-      setError(friendlyMessage(err, 'reentry'))
-    } finally {
+      setError(friendlyMessage(err, 'byCode'))
       setSubmitting(false)
     }
   }
 
   return (
-    <Screen title="¡Qué bueno verte!" subtitle="Escribe tu código de invitación para entrar.">
+    <Screen title="Entrar con mi código" subtitle="Si alguien ya te confirmó, escribe tu código de invitación.">
       <form onSubmit={submit} className="flex flex-col gap-4">
         <label htmlFor="code" className="sr-only">
           Código de invitación

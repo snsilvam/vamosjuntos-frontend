@@ -2,19 +2,19 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { apiFetch } from '../api/client'
 import type { Guest, GuestsResponse } from '../api/types'
+import { useAuth } from '../auth/useAuth'
 import Screen from '../components/Screen'
 import { Alert, textLink } from '../components/ui'
 import { friendlyMessage } from '../messages'
-import { useOnboarding } from '../onboarding/useOnboarding'
 
+// GuestListPage is the first step for an account that is not linked yet (FR-003).
 export default function GuestListPage() {
   const navigate = useNavigate()
-  const { update, reset } = useOnboarding()
+  const { user, signOut } = useAuth()
   const [guests, setGuests] = useState<Guest[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    reset()
     let cancelled = false
     apiFetch<GuestsResponse>('/api/onboarding/guests')
       .then((data) => {
@@ -26,12 +26,7 @@ export default function GuestListPage() {
     return () => {
       cancelled = true
     }
-  }, [reset])
-
-  function choose(guest: Guest) {
-    update({ guest, code: '', event: null, mode: 'list' })
-    navigate('/codigo')
-  }
+  }, [])
 
   return (
     <Screen title="¿Quién eres?" subtitle="Busca tu nombre para unirte al paseo.">
@@ -45,7 +40,7 @@ export default function GuestListPage() {
 
       {guests !== null && guests.length === 0 && (
         <p className="rounded-2xl bg-white/70 px-4 py-6 text-center text-stone-600">
-          Todos los invitados ya respondieron. Si ya confirmaste, entra con tu código.
+          Todos los invitados ya respondieron. Si alguien ya te confirmó, entra con tu código.
         </p>
       )}
 
@@ -55,7 +50,7 @@ export default function GuestListPage() {
             <li key={guest.id}>
               <button
                 type="button"
-                onClick={() => choose(guest)}
+                onClick={() => navigate('/codigo', { state: { guest } })}
                 className="min-h-14 w-full rounded-2xl bg-white px-4 py-3 text-lg font-semibold break-words shadow-sm ring-2 ring-orange-100 transition hover:ring-orange-400 active:scale-[0.98]"
               >
                 {guest.name}
@@ -65,9 +60,15 @@ export default function GuestListPage() {
         </ul>
       )}
 
-      <Link to="/ya-confirme" className={textLink}>
-        Ya confirmé, entrar con mi código
+      <Link to="/mi-codigo" className={textLink}>
+        Ya me confirmaron, entrar con mi código
       </Link>
+      <p className="text-center text-sm text-stone-500">
+        Entraste como {user?.email ?? 'invitado'}.{' '}
+        <button type="button" className="font-semibold text-orange-700 underline" onClick={() => void signOut()}>
+          Usar otra cuenta
+        </button>
+      </p>
     </Screen>
   )
 }
