@@ -25,3 +25,6 @@ dist-ssr
 
 # Variables locales (GUESTS_JSON, SESSION_KEY)
 .env*
+
+# Caché local de la CLI de Firebase
+.firebase/
