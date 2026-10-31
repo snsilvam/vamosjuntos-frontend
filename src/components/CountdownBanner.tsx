@@ -107,10 +107,12 @@ export default function CountdownBanner({ name }: { name: string }) {
 
   const { phase, daysLeft } = state.countdown
   const look = phases[phase]
-  const counting =
-    phase === 'far' || phase === 'near' || phase === 'lastWeek' || phase === 'tomorrow' || phase === 'today'
+  // daysLeft (calendar days) only picks the phase. The big number comes from the same count as the
+  // clock, so they never disagree (spec 004, FR-002 and FR-011); tomorrow and today show no number.
+  const counting = phase === 'far' || phase === 'near' || phase === 'lastWeek'
   const liveSeconds = secondsLeft ?? state.countdown.secondsToStart
   const liveCountdown = liveSeconds === undefined ? null : formatRemaining(liveSeconds)
+  const days = liveCountdown?.days ?? daysLeft
 
   return (
     // The entrance plays when the countdown arrives, not on the placeholder; reloads keep the same
@@ -123,24 +125,24 @@ export default function CountdownBanner({ name }: { name: string }) {
         <>
           <p className="mt-3 text-xl font-extrabold text-balance">{look.message}</p>
           <h1 className="mt-4 text-2xl font-bold text-balance break-words">
-            {name}, {daysLeft === 1 ? 'falta' : 'faltan'}{' '}
-            <span className="my-1 block text-8xl leading-none font-black tracking-tight">{daysLeft}</span>{' '}
-            {daysLeft === 1 ? 'día' : 'días'} para el paseo
+            {name}, {days === 1 ? 'falta' : 'faltan'}{' '}
+            <span className="my-1 block text-8xl leading-none font-black tracking-tight">{days}</span>{' '}
+            {days === 1 ? 'día' : 'días'} para el paseo
           </h1>
-          {liveCountdown && (
-            <p
-              className="mt-3 font-mono text-2xl font-bold tracking-tight tabular-nums"
-              aria-label={`${liveCountdown.days} días, ${liveCountdown.hours} horas, ${liveCountdown.minutes} minutos y ${liveCountdown.seconds} segundos`}
-            >
-              {liveCountdown.days}d {pad(liveCountdown.hours)}h {pad(liveCountdown.minutes)}m {pad(liveCountdown.seconds)}s
-            </p>
-          )}
         </>
       ) : (
         <h1 className="mt-3 text-balance break-words">
           <span className="block text-2xl font-bold">{name},</span>{' '}
           <span className="mt-1 block text-5xl leading-tight font-black">{look.message}</span>
         </h1>
+      )}
+      {liveCountdown && (
+        <p
+          className="mt-3 font-mono text-2xl font-bold tracking-tight tabular-nums"
+          aria-label={`${liveCountdown.days} días, ${liveCountdown.hours} horas, ${liveCountdown.minutes} minutos y ${liveCountdown.seconds} segundos`}
+        >
+          {liveCountdown.days}d {pad(liveCountdown.hours)}h {pad(liveCountdown.minutes)}m {pad(liveCountdown.seconds)}s
+        </p>
       )}
     </section>
   )
