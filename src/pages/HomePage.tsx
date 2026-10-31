@@ -36,6 +36,10 @@ export default function HomePage() {
         Itinerario: actividades y horarios
       </Link>
 
+      <Link to="/compras" className={`${secondaryButton} flex items-center justify-center text-center`}>
+        Compras: comida y suministros
+      </Link>
+
       <Link to="/confirmar-otro" className={textLink}>
         Confirmar a otro invitado
       </Link>

@@ -117,3 +117,29 @@ export interface Itinerary {
   days: string[]
   activities: Activity[]
 }
+
+// Purchases module (specs/007-modulo-compras/contracts/api.md).
+
+export type ItemCategory = 'comida' | 'suministros'
+
+export interface ItemInput {
+  name: string
+  category: ItemCategory
+  quantity: string
+  note: string
+}
+
+export interface Item {
+  id: string
+  name: string
+  category: ItemCategory
+  quantity?: string
+  note?: string
+  responsible?: Guest
+  bought: boolean
+}
+
+export interface Purchases {
+  items: Item[]
+  summary: { pending: number; bought: number }
+}

@@ -59,6 +59,14 @@ export function friendlyMessage(
       return 'La actividad debe estar dentro de los días del paseo.'
     case 'activity_not_found':
       return 'Esa actividad ya no existe. Actualizamos el itinerario.'
+    case 'invalid_item':
+      return 'Revisa los datos: el nombre es obligatorio y los textos no pueden ser tan largos.'
+    case 'item_taken':
+      return 'Este ítem ya lo lleva otra persona.'
+    case 'not_responsible':
+      return 'Solo quien lleva este ítem puede cambiarlo.'
+    case 'item_not_found':
+      return 'Ese ítem ya no existe. Actualizamos la lista.'
     case 'not_invited':
       return 'Ya no apareces en la lista de invitados. Escríbele al organizador.'
     default:

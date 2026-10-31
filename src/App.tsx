@@ -12,6 +12,7 @@ import GuestListPage from './pages/GuestListPage'
 import HomePage from './pages/HomePage'
 import ItineraryPage from './pages/ItineraryPage'
 import LinkByCodePage from './pages/LinkByCodePage'
+import PurchasesPage from './pages/PurchasesPage'
 import SignInPage from './pages/SignInPage'
 import TransportPage from './pages/TransportPage'
 import MeProvider from './session/MeProvider'
@@ -75,6 +76,7 @@ function AppRoutes() {
           <Route path="/confirmar-otro" element={<ConfirmOtherPage />} />
           <Route path="/transporte" element={<TransportPage />} />
           <Route path="/itinerario" element={<ItineraryPage />} />
+          <Route path="/compras" element={<PurchasesPage />} />
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       )
