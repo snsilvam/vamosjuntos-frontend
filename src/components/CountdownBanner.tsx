@@ -38,11 +38,15 @@ const bannerClass = 'rounded-3xl bg-linear-to-br px-5 py-7 text-center text-whit
 // The banner asks again when the phase can change and when the tab becomes visible (FR-009).
 export default function CountdownBanner({ name }: { name: string }) {
   const [state, setState] = useState<BannerState>({ kind: 'loading' })
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null)
 
   useEffect(() => {
     let active = true
     let latest = 0
     let timer: number | undefined
+    let tickTimer: number | undefined
+    let countdownStartedAt = 0
+    let countdownDuration = 0
 
     function load() {
       const request = ++latest
@@ -50,6 +54,18 @@ export default function CountdownBanner({ name }: { name: string }) {
         .then((countdown) => {
           if (!active || request !== latest) return
           setState({ kind: 'ready', countdown })
+          window.clearInterval(tickTimer)
+          if (countdown.secondsToStart !== undefined) {
+            countdownStartedAt = performance.now()
+            countdownDuration = countdown.secondsToStart
+            setSecondsLeft(countdownDuration)
+            tickTimer = window.setInterval(() => {
+              const elapsed = Math.floor((performance.now() - countdownStartedAt) / 1000)
+              setSecondsLeft(Math.max(0, countdownDuration - elapsed))
+            }, 250)
+          } else {
+            setSecondsLeft(null)
+          }
           window.clearTimeout(timer)
           // A duration, not a date: setTimeout measures elapsed time, whatever the device clock says.
           if (countdown.secondsToNextChange !== undefined) {
@@ -73,6 +89,7 @@ export default function CountdownBanner({ name }: { name: string }) {
     return () => {
       active = false
       window.clearTimeout(timer)
+      window.clearInterval(tickTimer)
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [])
@@ -90,7 +107,10 @@ export default function CountdownBanner({ name }: { name: string }) {
 
   const { phase, daysLeft } = state.countdown
   const look = phases[phase]
-  const counting = phase === 'far' || phase === 'near' || phase === 'lastWeek' || phase === 'tomorrow'
+  const counting =
+    phase === 'far' || phase === 'near' || phase === 'lastWeek' || phase === 'tomorrow' || phase === 'today'
+  const liveSeconds = secondsLeft ?? state.countdown.secondsToStart
+  const liveCountdown = liveSeconds === undefined ? null : formatRemaining(liveSeconds)
 
   return (
     // The entrance plays when the countdown arrives, not on the placeholder; reloads keep the same
@@ -107,6 +127,14 @@ export default function CountdownBanner({ name }: { name: string }) {
             <span className="my-1 block text-8xl leading-none font-black tracking-tight">{daysLeft}</span>{' '}
             {daysLeft === 1 ? 'día' : 'días'} para el paseo
           </h1>
+          {liveCountdown && (
+            <p
+              className="mt-3 font-mono text-2xl font-bold tracking-tight tabular-nums"
+              aria-label={`${liveCountdown.days} días, ${liveCountdown.hours} horas, ${liveCountdown.minutes} minutos y ${liveCountdown.seconds} segundos`}
+            >
+              {liveCountdown.days}d {pad(liveCountdown.hours)}h {pad(liveCountdown.minutes)}m {pad(liveCountdown.seconds)}s
+            </p>
+          )}
         </>
       ) : (
         <h1 className="mt-3 text-balance break-words">
@@ -116,4 +144,18 @@ export default function CountdownBanner({ name }: { name: string }) {
       )}
     </section>
   )
+}
+
+function formatRemaining(totalSeconds: number) {
+  const seconds = Math.max(0, Math.floor(totalSeconds))
+  return {
+    days: Math.floor(seconds / 86400),
+    hours: Math.floor((seconds % 86400) / 3600),
+    minutes: Math.floor((seconds % 3600) / 60),
+    seconds: seconds % 60,
+  }
+}
+
+function pad(value: number) {
+  return value.toString().padStart(2, '0')
 }

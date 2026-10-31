@@ -21,6 +21,8 @@ export interface Countdown {
   daysLeft: number
   // Absent once the trip is over: nothing changes again.
   secondsToNextChange?: number
+  // Relative to the backend clock; absent once the trip has started.
+  secondsToStart?: number
 }
 
 // GET /api/event, described in specs/003-card-proximo-viaje/contracts/api.md: only counts.
