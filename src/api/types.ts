@@ -13,6 +13,16 @@ export interface EventSummary {
   departurePlaces: string[]
 }
 
+// GET /api/countdown, described in specs/004-banner-cuenta-regresiva/contracts/api.md.
+export type CountdownPhase = 'far' | 'near' | 'lastWeek' | 'tomorrow' | 'today' | 'ongoing' | 'finished'
+
+export interface Countdown {
+  phase: CountdownPhase
+  daysLeft: number
+  // Absent once the trip is over: nothing changes again.
+  secondsToNextChange?: number
+}
+
 // GET /api/event, described in specs/003-card-proximo-viaje/contracts/api.md: only counts.
 export interface AttendanceSummary {
   invited: number

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 
 interface ScreenProps {
-  title: string
+  // The home page leaves it out: its countdown banner carries the heading (spec 004).
+  title?: string
   subtitle?: ReactNode
   children: ReactNode
 }
@@ -15,7 +16,7 @@ export default function Screen({ title, subtitle, children }: ScreenProps) {
           <p className="text-sm font-semibold tracking-widest text-orange-600 uppercase">
             Vamos Juntos
           </p>
-          <h1 className="mt-1 text-3xl font-extrabold text-balance break-words">{title}</h1>
+          {title && <h1 className="mt-1 text-3xl font-extrabold text-balance break-words">{title}</h1>}
           {subtitle && <p className="mt-2 text-stone-600">{subtitle}</p>}
         </header>
         {children}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../auth/useAuth'
+import CountdownBanner from '../components/CountdownBanner'
 import Screen from '../components/Screen'
 import TripCard from '../components/TripCard'
 import { secondaryButton, textLink } from '../components/ui'
@@ -21,11 +22,9 @@ export default function HomePage() {
   }
 
   return (
-    <Screen title={`¡Hola, ${name}!`}>
-      {/* Spec 004 (countdown banner) takes this place: it must be the first element. */}
-      <section className="rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-4 py-8 text-center text-stone-500">
-        Muy pronto verás aquí la cuenta regresiva.
-      </section>
+    <Screen>
+      {/* The banner is the first element and carries the greeting (spec 004, FR-001). */}
+      <CountdownBanner name={name} />
 
       <TripCard />
 
