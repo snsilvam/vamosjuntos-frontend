@@ -78,6 +78,13 @@ export function friendlyAuthMessage(error: unknown): string | null {
       return null
     case 'auth/popup-blocked':
       return 'Tu navegador bloqueó la ventana de Google. Permite las ventanas emergentes e intenta otra vez.'
+    case 'auth/unauthorized-domain':
+      return 'Este dominio todavía no está autorizado para iniciar sesión con Google. Escríbele al organizador.'
+    case 'auth/operation-not-allowed':
+      return 'El inicio de sesión con Google no está habilitado. Escríbele al organizador.'
+    case 'auth/invalid-api-key':
+    case 'auth/invalid-app-credential':
+      return 'La configuración de inicio de sesión no es válida. Escríbele al organizador.'
     case 'auth/account-exists-with-different-credential':
       return 'Ese correo ya entró con otro método. Usa el mismo con el que entraste antes.'
     case 'auth/too-many-requests':
