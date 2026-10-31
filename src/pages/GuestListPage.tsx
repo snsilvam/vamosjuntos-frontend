@@ -63,12 +63,12 @@ export default function GuestListPage() {
       <Link to="/mi-codigo" className={textLink}>
         Ya me confirmaron, entrar con mi código
       </Link>
-      <p className="text-center text-sm text-stone-500">
-        Entraste como {user?.email ?? 'invitado'}.{' '}
-        <button type="button" className="font-semibold text-orange-700 underline" onClick={() => void signOut()}>
+      <div className="flex flex-col items-center text-center text-sm text-stone-500">
+        <p className="break-all">Entraste como {user?.email ?? 'invitado'}.</p>
+        <button type="button" className={textLink} onClick={() => void signOut()}>
           Usar otra cuenta
         </button>
-      </p>
+      </div>
     </Screen>
   )
 }
