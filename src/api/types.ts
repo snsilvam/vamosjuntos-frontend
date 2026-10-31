@@ -88,3 +88,32 @@ export interface VehicleInput {
   departureTime: string
   note: string
 }
+
+// Itinerary module (specs/006-modulo-itinerario/contracts/api.md). Day and times are Colombia
+// wall-clock text.
+
+export interface ActivityInput {
+  title: string
+  date: string
+  startTime: string
+  endTime: string
+  endsNextDay: boolean
+  place: string
+  description: string
+}
+
+export interface Activity {
+  id: string
+  title: string
+  date: string
+  startTime: string
+  endTime?: string
+  endsNextDay?: boolean
+  place?: string
+  description?: string
+}
+
+export interface Itinerary {
+  days: string[]
+  activities: Activity[]
+}

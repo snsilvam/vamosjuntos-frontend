@@ -51,6 +51,14 @@ export function friendlyMessage(
       return 'Ese vehículo ya no existe. Actualiza la página.'
     case 'passenger_not_found':
       return 'Esa persona ya no va en este vehículo.'
+    case 'invalid_activity':
+      return 'Revisa los datos de la actividad: el título es obligatorio y los textos no pueden ser tan largos.'
+    case 'activity_time_order':
+      return 'La hora de fin debe ser después de la hora de inicio.'
+    case 'activity_out_of_range':
+      return 'La actividad debe estar dentro de los días del paseo.'
+    case 'activity_not_found':
+      return 'Esa actividad ya no existe. Actualizamos el itinerario.'
     case 'not_invited':
       return 'Ya no apareces en la lista de invitados. Escríbele al organizador.'
     default:

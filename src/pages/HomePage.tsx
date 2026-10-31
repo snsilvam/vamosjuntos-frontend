@@ -32,6 +32,10 @@ export default function HomePage() {
         Transporte: vehículos y cupos
       </Link>
 
+      <Link to="/itinerario" className={`${secondaryButton} flex items-center justify-center text-center`}>
+        Itinerario: actividades y horarios
+      </Link>
+
       <Link to="/confirmar-otro" className={textLink}>
         Confirmar a otro invitado
       </Link>

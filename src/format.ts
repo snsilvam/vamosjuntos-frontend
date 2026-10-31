@@ -40,3 +40,21 @@ export function formatAttendance(a: AttendanceSummary): string {
     count(a.pending, 'pendiente', 'pendientes'),
   ].join(' · ')
 }
+
+// formatClock turns "06:30" into "6:30 a. m.", as Colombians read it. The text is already Colombia
+// time, so nothing is converted.
+export function formatClock(hhmm: string): string {
+  const [h, m] = hhmm.split(':').map(Number)
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a. m.' : 'p. m.'}`
+}
+
+// A calendar day is read at noon UTC so no device time zone can move it (spec 006, research R6).
+const weekdayFormat = new Intl.DateTimeFormat('es-CO', { timeZone: 'UTC', weekday: 'long' })
+const monthFormat = new Intl.DateTimeFormat('es-CO', { timeZone: 'UTC', month: 'long' })
+
+// formatDayHeading turns "2026-12-23" into "Miércoles 23 de diciembre".
+export function formatDayHeading(date: string): string {
+  const noon = new Date(`${date}T12:00:00Z`)
+  const weekday = weekdayFormat.format(noon)
+  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${Number(date.slice(8, 10))} de ${monthFormat.format(noon)}`
+}

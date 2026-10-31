@@ -4,6 +4,7 @@ import { apiFetch } from '../api/client'
 import type { Departure, Guest, TransportResponse, Vehicle } from '../api/types'
 import Screen from '../components/Screen'
 import { Alert, fieldInput, primaryButton, secondaryButton, textLink } from '../components/ui'
+import { formatClock } from '../format'
 import { friendlyMessage } from '../messages'
 import { useMe } from '../session/useMe'
 import VehicleForm from './VehicleForm'
@@ -15,12 +16,6 @@ const departures: { id: Departure; label: string }[] = [
 
 const smallButton =
   'inline-flex min-h-11 items-center justify-center rounded-xl px-3 font-semibold text-orange-700 ring-2 ring-orange-200 transition hover:bg-orange-50 disabled:opacity-50'
-
-// formatClock turns "06:30" into "6:30 a. m.", as Colombians read it.
-function formatClock(hhmm: string): string {
-  const [h, m] = hhmm.split(':').map(Number)
-  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a. m.' : 'p. m.'}`
-}
 
 // TransportPage shows vehicles by departure place, free seats and who has no transport, and lets
 // any confirmed guest manage vehicles and seats (spec 005).

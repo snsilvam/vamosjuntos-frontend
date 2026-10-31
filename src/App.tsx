@@ -10,6 +10,7 @@ import ConfirmPage from './pages/ConfirmPage'
 import ErrorPage from './pages/ErrorPage'
 import GuestListPage from './pages/GuestListPage'
 import HomePage from './pages/HomePage'
+import ItineraryPage from './pages/ItineraryPage'
 import LinkByCodePage from './pages/LinkByCodePage'
 import SignInPage from './pages/SignInPage'
 import TransportPage from './pages/TransportPage'
@@ -73,6 +74,7 @@ function AppRoutes() {
           <Route path="/inicio" element={<HomePage />} />
           <Route path="/confirmar-otro" element={<ConfirmOtherPage />} />
           <Route path="/transporte" element={<TransportPage />} />
+          <Route path="/itinerario" element={<ItineraryPage />} />
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       )
