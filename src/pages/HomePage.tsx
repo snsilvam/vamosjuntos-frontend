@@ -28,6 +28,10 @@ export default function HomePage() {
 
       <TripCard />
 
+      <Link to="/transporte" className={`${secondaryButton} flex items-center justify-center text-center`}>
+        Transporte: vehículos y cupos
+      </Link>
+
       <Link to="/confirmar-otro" className={textLink}>
         Confirmar a otro invitado
       </Link>

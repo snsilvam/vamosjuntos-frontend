@@ -12,6 +12,7 @@ import GuestListPage from './pages/GuestListPage'
 import HomePage from './pages/HomePage'
 import LinkByCodePage from './pages/LinkByCodePage'
 import SignInPage from './pages/SignInPage'
+import TransportPage from './pages/TransportPage'
 import MeProvider from './session/MeProvider'
 import { useMe } from './session/useMe'
 
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/inicio" element={<HomePage />} />
           <Route path="/confirmar-otro" element={<ConfirmOtherPage />} />
+          <Route path="/transporte" element={<TransportPage />} />
           <Route path="*" element={<Navigate to="/inicio" replace />} />
         </Routes>
       )

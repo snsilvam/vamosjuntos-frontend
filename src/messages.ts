@@ -35,6 +35,22 @@ export function friendlyMessage(
       return 'Esta persona ya respondió la invitación.'
     case 'already_confirmed':
       return 'Ya habías confirmado tu asistencia.'
+    case 'invalid_vehicle':
+      return 'Revisa los datos: nombre, lugar de salida y entre 1 y 24 cupos.'
+    case 'driver_unavailable':
+      return 'Esa persona ya tiene lugar en otro vehículo o no ha confirmado.'
+    case 'seats_below_passengers':
+      return 'No puedes dejar menos cupos que pasajeros. Libera algún cupo primero.'
+    case 'vehicle_full':
+      return 'Este vehículo ya no tiene cupos.'
+    case 'guest_is_driver':
+      return 'Esa persona va manejando su propio vehículo.'
+    case 'guest_not_confirmed':
+      return 'Solo se puede reservar para invitados que confirmaron.'
+    case 'vehicle_not_found':
+      return 'Ese vehículo ya no existe. Actualiza la página.'
+    case 'passenger_not_found':
+      return 'Esa persona ya no va en este vehículo.'
     case 'not_invited':
       return 'Ya no apareces en la lista de invitados. Escríbele al organizador.'
     default:

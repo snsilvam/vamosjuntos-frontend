@@ -55,3 +55,34 @@ export interface ConfirmOtherResponse {
   status: 'confirmed'
   guest: Guest
 }
+
+// Transport module (specs/005-modulo-transporte/contracts/api.md).
+
+export type Departure = 'bogota' | 'tocancipa'
+
+export interface Vehicle {
+  id: string
+  name: string
+  driver: Guest
+  departure: Departure
+  seats: number
+  free: number
+  passengers: Guest[]
+  departureTime?: string
+  note?: string
+}
+
+export interface TransportResponse {
+  vehicles: Vehicle[]
+  withoutTransport: Guest[]
+  confirmed: Guest[]
+}
+
+export interface VehicleInput {
+  name: string
+  driverId: string
+  departure: Departure
+  seats: number
+  departureTime: string
+  note: string
+}
