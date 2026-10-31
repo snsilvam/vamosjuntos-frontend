@@ -13,6 +13,19 @@ export interface EventSummary {
   departurePlaces: string[]
 }
 
+// GET /api/event, described in specs/003-card-proximo-viaje/contracts/api.md: only counts.
+export interface AttendanceSummary {
+  invited: number
+  confirmed: number
+  declined: number
+  pending: number
+}
+
+export interface EventResponse {
+  event: EventSummary
+  attendance: AttendanceSummary
+}
+
 // Me is the state of the signed-in account (GET /api/me and POST /api/onboarding/link).
 export type Me =
   | { status: 'unlinked' }

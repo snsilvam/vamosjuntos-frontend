@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useAuth } from '../auth/useAuth'
 import Screen from '../components/Screen'
+import TripCard from '../components/TripCard'
 import { secondaryButton, textLink } from '../components/ui'
 import { useMe } from '../session/useMe'
 
@@ -21,10 +22,12 @@ export default function HomePage() {
 
   return (
     <Screen title={`¡Hola, ${name}!`}>
-      {/* Specs 003 (card "Próximo viaje") and 004 (countdown banner) fill this page. */}
+      {/* Spec 004 (countdown banner) takes this place: it must be the first element. */}
       <section className="rounded-3xl border-2 border-dashed border-orange-200 bg-white/60 px-4 py-8 text-center text-stone-500">
-        Muy pronto verás aquí la cuenta regresiva y los datos del paseo.
+        Muy pronto verás aquí la cuenta regresiva.
       </section>
+
+      <TripCard />
 
       <Link to="/confirmar-otro" className={textLink}>
         Confirmar a otro invitado
