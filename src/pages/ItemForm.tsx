@@ -34,7 +34,9 @@ export default function ItemForm({ item, items, onSaved, onCancel }: ItemFormPro
   // The name the guest already chose to keep despite the warning.
   const [confirmedName, setConfirmedName] = useState<string | null>(null)
 
-  const repeated = items.some((other) => other.id !== item?.id && foldName(other.name) === foldName(name))
+  // Only a new or changed name is checked: editing the quantity of "Arroz" must not warn again.
+  const nameChanged = item === undefined || foldName(item.name) !== foldName(name)
+  const repeated = nameChanged && items.some((other) => other.id !== item?.id && foldName(other.name) === foldName(name))
   const mustConfirm = repeated && confirmedName !== foldName(name)
 
   async function submit(e: FormEvent) {
