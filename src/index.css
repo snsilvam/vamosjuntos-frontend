@@ -14,4 +14,29 @@
       transform: none;
     }
   }
+
+  /* Gentle drift of the banner's decorative emojis; always used with motion-safe:. */
+  --animate-float: float 4s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(4deg);
+    }
+  }
+
+  /* Small pop of the seconds tile each time it changes; always used with motion-safe:. */
+  --animate-tick: tick 0.35s ease-out;
+
+  @keyframes tick {
+    from {
+      transform: scale(1.18);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
 }
