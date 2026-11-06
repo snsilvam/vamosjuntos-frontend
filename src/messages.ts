@@ -17,7 +17,6 @@ export function friendlyMessage(
   switch (error.code) {
     case 'invalid_code':
       if (context === 'byCode') return 'No encontramos ese código. Revísalo e intenta de nuevo.'
-      if (context === 'other') return `Ese código no corresponde a ${vars.nombre ?? 'esa persona'}.`
       return 'Ese código no coincide con tu nombre. Revísalo e intenta de nuevo.'
     case 'too_many_attempts': {
       const minutes = Math.max(1, Math.ceil((error.retryAfterSeconds ?? 900) / 60))
@@ -26,6 +25,8 @@ export function friendlyMessage(
     case 'account_already_linked':
       return 'Tu cuenta ya está vinculada a otro invitado.'
     case 'guest_already_linked':
+      // Confirming someone else (spec 009): that guest has an account and answers for themselves.
+      if (context === 'other') return `${vars.nombre ?? 'Esa persona'} ya entró con su propia cuenta y responde desde ahí.`
       return 'Esta persona ya entró con otra cuenta. Si eres tú y perdiste esa cuenta, escríbele al organizador.'
     case 'event_not_found':
       return 'El paseo aún no está disponible. Intenta más tarde.'
